@@ -1,24 +1,26 @@
+<p align="center">
+   <img src="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png" alt="CrowdStrike logo" width="500"/>
+</p>
+
 # CrowdStrike Falcon Elastic Beanstalk Deployment
 
  This repository contains a sample AWS Elasticbeanstalk application to help illustrate how to deploy the Falcon sensor on your Elastic Beanstalk compute resources.
 
-## Deployment Methods
-
  There are 3 main ways to deploy the Falcon sensor:
 
-### AWS SSM
+## AWS SSM
 
 This method involves using AWS SSM distributor to deploy the Falcon sensor directly on the machine. An in depth guide can be found [in this repository](https://github.com/CrowdStrike/aws-ssm-distributor?tab=readme-ov-file)
 
-### Baked in AMI
+## Baked in AMI
 
 This method involves creating custom AMIs with the Falcon sensor already installed using [EC2 Image Builder](https://aws.amazon.com/image-builder/), and using that AMI for your Elasticbeanstalk compute resources. An in depth guide can be found here *to-do: add documentation reference*
 
-### ebextensions
+## ebextensions
 
 The recommended way to install the Falcon sensor for Elastic beanstalk workloads is by utilizing ebextensions.
 
-#### Configuration
+### Configuration
 
 First, you will need to add the Falcon client id and secret to Secrets Manager.
 
@@ -48,7 +50,7 @@ option_settings:
     SECRET_ID: <secret name>
 ```
 
->[Note]: Remember to change \<secret name\> to your actual secret name
+>[!Note]: Remember to change \<secret name\> to your actual secret name
 
 This config will ensure the secret name is exported as an environment variable.
 
@@ -62,16 +64,16 @@ container_commands:
 
 This config will execute the falcon install script we previously created at runtime.
 
-#### Deploying example app
+### Deploying example app
 
-##### Prerequisites
+#### Prerequisites
 
 - Falcon Client ID
 - Falcon Client Secret
 - [aws-elasticbeanstalk-service-role](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/concepts-roles-service.html)
 - Instance Profile
 
-##### Store Falcon credentials
+#### Store Falcon credentials
 
 - Open the AWS console ans navigate to Secrets Manager.
 - Click on **Store a new secret**.
@@ -80,9 +82,9 @@ This config will execute the falcon install script we previously created at runt
 - Under **Secret Name** enter **ebs/falcon/credentials**
 - Click **Next** -> **Next** -> **Store**
 
-##### Create a key-pair
+#### Create a key-pair
 
->[Note]: If you already have a key pair you want to use, feel free to skip this step
+>[!Note]: If you already have a key pair you want to use, feel free to skip this step
 
 In the AWS Console, navigate to **EC2**
 
@@ -94,7 +96,7 @@ Give your key pair a suitable name.
 
 Click **Create key pair** as save your key to a secure location.
 
-##### Create an Instance profile
+#### Create an Instance profile
 
 Navigate to **IAM** in the AWS console.
 
@@ -108,7 +110,7 @@ Select the **AWSElasticBeanstalkWebTier** and **SecretsManagerReadWrite** manage
 
 Give your role a name then click **Create role**
 
-##### Create Elastic Beanstalk Environment
+#### Create Elastic Beanstalk Environment
 
 Navigate to **Elastic Beanstalk** in the AWS Console
 Click on **Create environment**
@@ -132,7 +134,7 @@ Click on **Create environment**
   - Leave everything else as default, scroll down, and click **Skip to review**
   - Click **Submit**
 
-##### Package the sample application
+#### Package the sample application
 
 Open up this root directory in your terminal and execute the following commands
 
@@ -140,7 +142,7 @@ Open up this root directory in your terminal and execute the following commands
 zip -r ./hello_world.zip .
 ```
 
-##### Deploy the sample application
+#### Deploy the sample application
 
 Navigate back to the environment we created in Elastic Beanstalk.
 
@@ -150,13 +152,13 @@ Select the **hello_world.zip** file we created.
 
 Click **Deploy**
 
-##### Verify the sample application was deployed correctly
+#### Verify the sample application was deployed correctly
 
 Click the url under **Domain**
 
 You should see a simple webpage with a `Hello World!` message
 
-#### Verify the Falcon sensor was installed correctly
+### Verify the Falcon sensor was installed correctly
 
 In the logs tab, click **Request logs** and then **Full**
 
