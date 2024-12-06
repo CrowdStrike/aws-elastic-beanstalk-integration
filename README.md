@@ -4,7 +4,9 @@
 
 # CrowdStrike Falcon Elastic Beanstalk Deployment
 
- This repository contains a sample AWS Elasticbeanstalk application to help illustrate how to deploy the Falcon sensor on your Elastic Beanstalk compute resources. The recommended way is to use use an ebextension to deploy the Falcon sensor, but there are two other methods described at the bottom of this readme you can also utilize.
+ This repository contains a sample AWS Elasticbeanstalk application to help illustrate how to deploy the Falcon sensor on your Elastic Beanstalk compute resources.
+
+ The recommended way is to use use an ebextension to deploy the Falcon sensor, but there are two other methods described at the bottom of this readme you can also utilize.
 
 ## ebextensions (Recommended)
 
@@ -28,7 +30,8 @@ curl -L https://raw.githubusercontent.com/crowdstrike/falcon-scripts/v1.7.1/bash
 
 ```
 
-This script retrieves the Falcon credentials from secrets manager, and installs the sensor using the linux script from the [falcon-scripts repository](https://github.com/CrowdStrike/falcon-scripts).
+> [!NOTE]
+> This script retrieves the Falcon credentials from secrets manager, and installs the sensor using the linux script from the [falcon-scripts repository](https://github.com/CrowdStrike/falcon-scripts).
 
 3. Create a `.ebextensions` directory in the root of the application package. Within this folder, create the following files.
 
@@ -43,7 +46,8 @@ option_settings:
 >[!TIP]
 > Remember to change \<secret name\> to your actual secret name
 
-This config will ensure the secret name is exported as an environment variable.
+> [!NOTE]
+> This config will ensure the secret name is exported as an environment variable.
 
 `falcon.config`
 
