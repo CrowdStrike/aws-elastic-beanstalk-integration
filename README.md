@@ -8,6 +8,25 @@
 
  The recommended way is to use use an ebextension to deploy the Falcon sensor, but there are two other methods described at the bottom of this readme you can also utilize.
 
+## Table of Contents
+
+- [ebextensions (Recommended)](#ebextensions-recommended)
+  - [Configuration](#configuration)
+- [Deploying the Example Application](#deploying-the-example-application)
+  - [Prerequisites](#prerequisites)
+  - [Deployment Steps](#deployment-steps)
+    - [Step 1: Store Falcon Credentials](#step-1-store-falcon-credentials)
+    - [Step 2: Create a Key-Pair](#step-2-create-a-key-pair)
+    - [Step 3: Create an Instance Profile](#step-3-create-an-instance-profile)
+    - [Step 4: Create Elastic Beanstalk Environment](#step-4-create-elastic-beanstalk-environment)
+    - [Step 5: Package the Sample Application](#step-5-package-the-sample-application)
+    - [Step 6: Deploy the Sample Application](#step-6-deploy-the-sample-application)
+    - [Step 7: Verify the Application Deployment](#step-7-verify-the-application-deployment)
+    - [Step 8: Verify the Falcon Sensor Installation](#step-8-verify-the-falcon-sensor-installation)
+- [Other Deployment Options](#other-deployment-options)
+  - [AWS SSM](#aws-ssm)
+  - [Baked in AMI](#baked-in-ami)
+
 ## ebextensions (Recommended)
 
 ### Configuration
@@ -154,13 +173,13 @@ zip -r ./hello_world.zip .
 
 1. Click **Deploy**
 
-#### Step 7: Verify the sample application was deployed correctly
+#### Step 7: Verify the application deployment
 
 1. Click the url under **Domain**
 
 1. You should see a simple webpage with a `Hello World!` message
 
-#### Step 8: Verify the Falcon sensor was installed correctly
+#### Step 8: Verify the Falcon sensor installation
 
 1. In the logs tab, click **Request logs** and then **Full**
 
