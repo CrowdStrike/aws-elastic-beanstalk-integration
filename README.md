@@ -10,15 +10,13 @@
 
 ## ebextensions (Recommended)
 
-The recommended way to install the Falcon sensor for Elastic beanstalk workloads is by utilizing ebextensions.
-
 ### Configuration
 
 1. First, add the Falcon client id and secret to Secrets Manager.
 
-1. Create a `script` folder. In the script folder, create the following file.
+1. Create a `scripts` folder. In the script folder, create the following file.
 
-`install_falcon.sh`
+`scripts/install_falcon.sh`
 
 ```bash
 #!/bin/bash
@@ -35,7 +33,7 @@ curl -L https://raw.githubusercontent.com/crowdstrike/falcon-scripts/v1.7.1/bash
 
 3. Create a `.ebextensions` directory in the root of the application package. Within this folder, create the following files.
 
-`ssm.config`
+`.ebextensions/ssm.config`
 
 ```
 option_settings:
@@ -49,7 +47,7 @@ option_settings:
 > [!NOTE]
 > This config will ensure the secret name is exported as an environment variable.
 
-`falcon.config`
+`.ebextensions/falcon.config`
 
 ```
 container_commands:
@@ -57,7 +55,8 @@ container_commands:
     command: "sh scripts/install_falcon.sh"
 ```
 
-This config will execute the falcon install script we previously created at runtime.
+> [!NOTE]
+> This config will execute the falcon install script we previously created at runtime.
 
 ## Deploying the example application
 
