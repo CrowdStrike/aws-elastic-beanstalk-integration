@@ -6,27 +6,36 @@
 
  This repository contains a sample AWS Elasticbeanstalk application to help illustrate how to deploy the Falcon sensor on your Elastic Beanstalk compute resources.
 
- There are 3 main ways to deploy the Falcon sensor:
+ The recommended way is to use use an ebextension to deploy the Falcon sensor, but there are two other methods described at the bottom of this readme you can also utilize.
 
-## AWS SSM
+## Table of Contents
 
-This method involves using AWS SSM distributor to deploy the Falcon sensor directly on the machine. An in depth guide can be found [in this repository](https://github.com/CrowdStrike/aws-ssm-distributor?tab=readme-ov-file)
+- [ebextensions (Recommended)](#ebextensions-recommended)
+  - [Configuration](#configuration)
+- [Deploying the Example Application](#deploying-the-example-application)
+  - [Prerequisites](#prerequisites)
+  - [Deployment Steps](#deployment-steps)
+    - [Step 1: Store Falcon Credentials](#step-1-store-falcon-credentials)
+    - [Step 2: Create a Key-Pair](#step-2-create-a-key-pair)
+    - [Step 3: Create an Instance Profile](#step-3-create-an-instance-profile)
+    - [Step 4: Create Elastic Beanstalk Environment](#step-4-create-elastic-beanstalk-environment)
+    - [Step 5: Package the Sample Application](#step-5-package-the-sample-application)
+    - [Step 6: Deploy the Sample Application](#step-6-deploy-the-sample-application)
+    - [Step 7: Verify the Application Deployment](#step-7-verify-the-application-deployment)
+    - [Step 8: Verify the Falcon Sensor Installation](#step-8-verify-the-falcon-sensor-installation)
+- [Other Deployment Options](#other-deployment-options)
+  - [AWS SSM](#aws-ssm)
+  - [Baked in AMI](#baked-in-ami)
 
-## Baked in AMI
-
-This method involves creating custom AMIs with the Falcon sensor already installed using [EC2 Image Builder](https://aws.amazon.com/image-builder/), and using that AMI for your Elasticbeanstalk compute resources. An in depth guide can be found here *to-do: add documentation reference*
-
-## ebextensions
-
-The recommended way to install the Falcon sensor for Elastic beanstalk workloads is by utilizing ebextensions.
+## ebextensions (Recommended)
 
 ### Configuration
 
-First, you will need to add the Falcon client id and secret to Secrets Manager.
+1. First, add the Falcon client id and secret to Secrets Manager.
 
-Create a `script` folder. In the script folder, create the following file.
+1. Create a `scripts` folder. In the script folder, create the following file.
 
-`install_falcon.sh`
+`scripts/install_falcon.sh`
 
 ```bash
 #!/bin/bash
@@ -38,11 +47,12 @@ curl -L https://raw.githubusercontent.com/crowdstrike/falcon-scripts/v1.7.1/bash
 
 ```
 
-This script retrieves the Falcon credentials from secrets manager, and installs the sensor using the linux script from the [falcon-scripts repository](https://github.com/CrowdStrike/falcon-scripts).
+> [!NOTE]
+> This script retrieves the Falcon credentials from secrets manager, and installs the sensor using the linux script from the [falcon-scripts repository](https://github.com/CrowdStrike/falcon-scripts).
 
-Create a `.ebextensions` directory in the root of the application package. Within this folder, create the following files.
+3. Create a `.ebextensions` directory in the root of the application package. Within this folder, create the following files.
 
-`ssm.config`
+`.ebextensions/ssm.config`
 
 ```
 option_settings:
@@ -50,11 +60,13 @@ option_settings:
     SECRET_ID: <secret name>
 ```
 
->[!Note]: Remember to change \<secret name\> to your actual secret name
+>[!TIP]
+> Remember to change \<secret name\> to your actual secret name
 
-This config will ensure the secret name is exported as an environment variable.
+> [!NOTE]
+> This config will ensure the secret name is exported as an environment variable.
 
-`falcon.config`
+`.ebextensions/falcon.config`
 
 ```
 container_commands:
@@ -62,57 +74,66 @@ container_commands:
     command: "sh scripts/install_falcon.sh"
 ```
 
-This config will execute the falcon install script we previously created at runtime.
+> [!NOTE]
+> This config will execute the falcon install script we previously created at runtime.
 
-### Deploying example app
+## Deploying the example application
 
-#### Prerequisites
+### Prerequisites
 
-- Falcon Client ID
-- Falcon Client Secret
-- [aws-elasticbeanstalk-service-role](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/concepts-roles-service.html)
-- Instance Profile
+- Have a current CrowdStrike Subscription
+- Have appropriate AWS permissions to run CloudFormation and create resources
+- Generate Falcon API credentials (Client ID and Client Secret)
+- Ensure you have the [aws-elasticbeanstalk-service-role](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/concepts-roles-service.html) deployed in your AWS account
 
-#### Store Falcon credentials
+### Deployment steps
 
-- Open the AWS console ans navigate to Secrets Manager.
-- Click on **Store a new secret**.
-- Under **Secret type** Choose **Other type of secret**
-- Create an entry for **FALCON_CLIENT_ID** and **FALCON_CLIENT_SECRET** with their respective values
-- Under **Secret Name** enter **ebs/falcon/credentials**
-- Click **Next** -> **Next** -> **Store**
+#### Step 1: Store Falcon credentials
 
-#### Create a key-pair
+1. Open the AWS console ans navigate to Secrets Manager.
 
->[!Note]: If you already have a key pair you want to use, feel free to skip this step
+1. Click on **Store a new secret**.
 
-In the AWS Console, navigate to **EC2**
+1. Under **Secret type** Choose **Other type of secret**
 
-Under **Network and security** click **Key Pairs**
+1. Create an entry for **FALCON_CLIENT_ID** and **FALCON_CLIENT_SECRET** with their respective values
 
-Click **Create key pair**
+1. Under **Secret Name** enter **ebs/falcon/credentials**
 
-Give your key pair a suitable name.
+1. Click **Next** -> **Next** -> **Store**
 
-Click **Create key pair** as save your key to a secure location.
+#### Step 2: Create a key-pair
 
-#### Create an Instance profile
+>[!NOTE]
+> If you already have a key pair you want to use, feel free to skip this step
 
-Navigate to **IAM** in the AWS console.
+1. In the AWS Console, navigate to **EC2**
 
-Click **Roles** and **Create role**
+1. Under **Network and security** click **Key Pairs**
 
-Under **Select trusted entity** choose **AWS Service**
+1. Click **Create key pair**
 
-Under **Use case** choose **EC2** then click **Next**
+1. Give your key pair a suitable name.
 
-Select the **AWSElasticBeanstalkWebTier** and **SecretsManagerReadWrite** managed policies. Click **Next**
+1. Click **Create key pair** as save your key to a secure location.
 
-Give your role a name then click **Create role**
+#### Step 3: Create an Instance profile
 
-#### Create Elastic Beanstalk Environment
+1. Navigate to **IAM** in the AWS console.
 
-Navigate to **Elastic Beanstalk** in the AWS Console
+1. Click **Roles** and **Create role**
+
+1. Under **Select trusted entity** choose **AWS Service**
+
+1. Under **Use case** choose **EC2** then click **Next**
+
+1. Select the **AWSElasticBeanstalkWebTier** and **SecretsManagerReadWrite** managed policies. Click **Next**
+
+1. Give your role a name then click **Create role**
+
+#### Step 4: Create Elastic Beanstalk Environment
+
+1. Navigate to **Elastic Beanstalk** in the AWS Console
 Click on **Create environment**
 
 - **Configure Environment**
@@ -134,7 +155,7 @@ Click on **Create environment**
   - Leave everything else as default, scroll down, and click **Skip to review**
   - Click **Submit**
 
-#### Package the sample application
+#### Step 5: Package the sample application
 
 Open up this root directory in your terminal and execute the following commands
 
@@ -142,29 +163,29 @@ Open up this root directory in your terminal and execute the following commands
 zip -r ./hello_world.zip .
 ```
 
-#### Deploy the sample application
+#### Step 6: Deploy the sample application
 
-Navigate back to the environment we created in Elastic Beanstalk.
+1. Navigate back to the environment we created in Elastic Beanstalk.
 
-Click **Upload and deploy**.
+1. Click **Upload and deploy**.
 
-Select the **hello_world.zip** file we created.
+1. Select the **hello_world.zip** file we created.
 
-Click **Deploy**
+1. Click **Deploy**
 
-#### Verify the sample application was deployed correctly
+#### Step 7: Verify the application deployment
 
-Click the url under **Domain**
+1. Click the url under **Domain**
 
-You should see a simple webpage with a `Hello World!` message
+1. You should see a simple webpage with a `Hello World!` message
 
-### Verify the Falcon sensor was installed correctly
+#### Step 8: Verify the Falcon sensor installation
 
-In the logs tab, click **Request logs** and then **Full**
+1. In the logs tab, click **Request logs** and then **Full**
 
-Download and unzip the contents
+1. Download and unzip the contents
 
-In the `var/log/` directory, open the cfn-init-cmd.log file. At the bottom of the file, you should see some logs that resemble the following
+1. In the `var/log/` directory, open the cfn-init-cmd.log file. At the bottom of the file, you should see some logs that resemble the following
 
 ```
 ...
@@ -191,4 +212,15 @@ In the `var/log/` directory, open the cfn-init-cmd.log file. At the bottom of th
 
 Congratulations! The sensor was successfully installed.
 
-You can further confirm this by querying for your instance in the Falcon console.
+>[!TIP]
+>You can further confirm this by querying for your instance in the Falcon console.
+
+### Other Deployment Options
+
+#### AWS SSM
+
+This method involves using AWS SSM distributor to deploy the Falcon sensor directly on the machine. An in depth guide can be found [in this repository](https://github.com/CrowdStrike/aws-ssm-distributor?tab=readme-ov-file)
+
+#### Baked in AMI
+
+This method involves creating custom AMIs with the Falcon sensor already installed using [EC2 Image Builder](https://aws.amazon.com/image-builder/), and using that AMI for your Elasticbeanstalk compute resources. An in depth guide can be found here *to-do: add documentation reference*
