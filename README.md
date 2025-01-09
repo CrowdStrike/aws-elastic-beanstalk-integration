@@ -52,7 +52,7 @@ curl -L https://raw.githubusercontent.com/crowdstrike/falcon-scripts/v1.7.1/bash
 
 3. Create a `.ebextensions` directory in the root of the application package. Within this folder, create the following files.
 
-`.ebextensions/ssm.config`
+`.ebextensions/secrets_manager.config`
 
 ```
 option_settings:
