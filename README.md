@@ -223,4 +223,4 @@ This method involves using AWS SSM distributor to deploy the Falcon sensor direc
 
 #### Baked in AMI
 
-This method involves creating custom AMIs with the Falcon sensor already installed using [EC2 Image Builder](https://aws.amazon.com/image-builder/), and using that AMI for your Elasticbeanstalk compute resources. An in depth guide can be found here *to-do: add documentation reference*
+This method involves creating custom AMIs with the Falcon sensor already installed using [EC2 Image Builder](https://aws.amazon.com/image-builder/), and using that AMI for your Elasticbeanstalk compute resources. An in depth guide can be found [in this repository](https://github.com/CrowdStrike/aws-ec2-image-builder)
