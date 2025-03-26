@@ -1,7 +1,5 @@
-<p align="center">
-   <img src="https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png" alt="CrowdStrike logo" width="500"/>
-</p>
-
+> [!CAUTION]
+> This repository is deprecated. Please go to [https://github.com/CrowdStrike/Cloud-AWS/tree/main/beanstalk](https://github.com/CrowdStrike/Cloud-AWS/tree/main/beanstalk) to see the latest supported version.
 # CrowdStrike Falcon Elastic Beanstalk Deployment
 
  This repository contains a sample AWS Elasticbeanstalk application to help illustrate how to deploy the Falcon sensor on your Elastic Beanstalk compute resources.
